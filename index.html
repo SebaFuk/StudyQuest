@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyQuest - Tu Compañero de Estudio</title>
+    <meta name="description"
+        content="Juego educativo de preguntas y respuestas para practicar contenidos universitarios. Múltiples modos de juego, niveles de dificultad y sistema de pistas.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Animated Background -->
+        <div class="animated-bg">
+            <div class="gradient-orb orb-1"></div>
+            <div class="gradient-orb orb-2"></div>
+            <div class="gradient-orb orb-3"></div>
+        </div>
+
+        <!-- Main Menu Screen -->
+        <section id="main-menu" class="screen active">
+            <div class="logo-container">
+                <div class="logo-icon">🎓</div>
+                <h1 class="logo-text">StudyQuest</h1>
+                <p class="tagline">Tu compañero de estudio interactivo</p>
+            </div>
+
+            <div class="menu-card glass-card">
+                <h2>Seleccioná tu carrera</h2>
+                <div id="career-grid" class="career-grid">
+                    <!-- Careers loaded dynamically -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Difficulty Selection Screen -->
+        <section id="difficulty-screen" class="screen">
+            <button class="back-btn" onclick="app.showScreen('main-menu')">
+                <span class="back-icon">←</span> Volver
+            </button>
+
+            <div class="screen-content">
+                <h2 class="screen-title">Nivel de Dificultad</h2>
+                <p class="screen-subtitle">¿Qué tan desafiante querés que sea?</p>
+
+                <div class="difficulty-options">
+                    <button class="difficulty-card" data-difficulty="easy" onclick="app.selectDifficulty('easy')">
+                        <div class="difficulty-icon">🟢</div>
+                        <h3>Fácil</h3>
+                        <p>Conceptos básicos y definiciones simples</p>
+                    </button>
+
+                    <button class="difficulty-card" data-difficulty="medium" onclick="app.selectDifficulty('medium')">
+                        <div class="difficulty-icon">🟡</div>
+                        <h3>Intermedio</h3>
+                        <p>Aplicación de conceptos + preguntas básicas</p>
+                    </button>
+
+                    <button class="difficulty-card" data-difficulty="hard" onclick="app.selectDifficulty('hard')">
+                        <div class="difficulty-icon">🔴</div>
+                        <h3>Difícil</h3>
+                        <p>Análisis, razonamiento y relaciones complejas</p>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Game Mode Selection Screen -->
+        <section id="mode-screen" class="screen">
+            <button class="back-btn" onclick="app.showScreen('difficulty-screen')">
+                <span class="back-icon">←</span> Volver
+            </button>
+
+            <div class="screen-content">
+                <h2 class="screen-title">Modo de Juego</h2>
+                <p class="screen-subtitle">Elegí cómo querés practicar</p>
+
+                <div class="mode-grid">
+                    <button class="mode-card" onclick="app.startGame('multiple_choice')">
+                        <div class="mode-icon">📝</div>
+                        <h3>Multiple Choice</h3>
+                        <p>4 opciones, sin límites, práctica libre</p>
+                        <span class="mode-tag practice">Práctica</span>
+                    </button>
+
+                    <button class="mode-card exam" onclick="app.startGame('multiple_choice_exam')">
+                        <div class="mode-icon">🎯</div>
+                        <h3>Multiple Choice Exam</h3>
+                        <p>Con puntos, termina a los 5 errores</p>
+                        <span class="mode-tag exam-tag">Examen</span>
+                    </button>
+
+                    <button class="mode-card" onclick="app.startGame('open_answer')">
+                        <div class="mode-icon">✍️</div>
+                        <h3>Preguntas Abiertas</h3>
+                        <p>Escribí tu respuesta libremente</p>
+                        <span class="mode-tag practice">Práctica</span>
+                    </button>
+
+                    <button class="mode-card exam" onclick="app.startGame('open_answer_exam')">
+                        <div class="mode-icon">📋</div>
+                        <h3>Preguntas Exam</h3>
+                        <p>Respuestas escritas con puntuación</p>
+                        <span class="mode-tag exam-tag">Examen</span>
+                    </button>
+
+                    <button class="mode-card mix" onclick="app.startGame('mix')">
+                        <div class="mode-icon">🎲</div>
+                        <h3>Modo Mix</h3>
+                        <p>Combina todos los tipos de preguntas</p>
+                        <span class="mode-tag mix-tag">Mixto</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Game Screen -->
+        <section id="game-screen" class="screen">
+            <div class="game-header">
+                <button class="back-btn" onclick="app.confirmExit()">
+                    <span class="back-icon">←</span> Volver al menú
+                </button>
+
+                <div class="game-stats-bar">
+                    <div class="stat-item correct-stat">
+                        <span class="stat-icon">✓</span>
+                        <span id="correct-count">0</span>
+                    </div>
+                    <div class="stat-item incorrect-stat">
+                        <span class="stat-icon">✗</span>
+                        <span id="incorrect-count">0</span>
+                    </div>
+                    <div class="stat-item score-stat" id="score-container" style="display: none;">
+                        <span class="stat-icon">⭐</span>
+                        <span id="score-display">0</span>
+                    </div>
+                    <div class="stat-item errors-stat" id="errors-container" style="display: none;">
+                        <span class="stat-icon">❌</span>
+                        <span id="errors-remaining">5</span> restantes
+                    </div>
+                </div>
+            </div>
+
+            <div class="game-content">
+                <div class="question-card glass-card">
+                    <div class="question-header">
+                        <span class="question-number" id="question-number">Pregunta 1</span>
+                        <span class="question-topic" id="question-topic">Hardware</span>
+                    </div>
+
+                    <p class="question-text" id="question-text">
+                        Cargando pregunta...
+                    </p>
+
+                    <!-- Multiple Choice Options -->
+                    <div id="mc-options" class="mc-options">
+                        <button class="option-btn" data-index="0"></button>
+                        <button class="option-btn" data-index="1"></button>
+                        <button class="option-btn" data-index="2"></button>
+                        <button class="option-btn" data-index="3"></button>
+                    </div>
+
+                    <!-- Open Answer Input -->
+                    <div id="open-answer-container" class="open-answer-container" style="display: none;">
+                        <input type="text" id="answer-input" class="answer-input" placeholder="Escribí tu respuesta..."
+                            autocomplete="off">
+                        <button class="submit-answer-btn" onclick="app.game.submitOpenAnswer()">
+                            Verificar respuesta
+                        </button>
+                    </div>
+
+                    <!-- Hint Section -->
+                    <div class="hint-section">
+                        <button class="hint-btn" id="hint-btn" onclick="app.game.requestHint()">
+                            💡 Pedir pista
+                            <span class="hint-penalty" id="hint-penalty"></span>
+                        </button>
+                        <div class="hint-display" id="hint-display" style="display: none;">
+                            <p id="hint-text"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feedback Overlay -->
+                <div class="feedback-overlay" id="feedback-overlay">
+                    <div class="feedback-card" id="feedback-card">
+                        <div class="feedback-icon" id="feedback-icon">✓</div>
+                        <h3 id="feedback-title">¡Correcto!</h3>
+                        <p id="feedback-message"></p>
+                        <div class="correct-answer-display" id="correct-answer-display" style="display: none;">
+                            <span>La respuesta correcta era:</span>
+                            <strong id="correct-answer-text"></strong>
+                        </div>
+                        <button class="next-btn" onclick="app.game.nextQuestion()">
+                            Siguiente pregunta →
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Results Screen -->
+        <section id="results-screen" class="screen">
+            <div class="results-container">
+                <div class="results-header">
+                    <div class="results-icon" id="results-icon">🏆</div>
+                    <h2 id="results-title">¡Partida Terminada!</h2>
+                </div>
+
+                <div class="results-card glass-card">
+                    <div class="results-stats">
+                        <div class="result-stat">
+                            <span class="result-value" id="result-total">0</span>
+                            <span class="result-label">Preguntas</span>
+                        </div>
+                        <div class="result-stat correct">
+                            <span class="result-value" id="result-correct">0</span>
+                            <span class="result-label">Correctas</span>
+                        </div>
+                        <div class="result-stat incorrect">
+                            <span class="result-value" id="result-incorrect">0</span>
+                            <span class="result-label">Incorrectas</span>
+                        </div>
+                    </div>
+
+                    <div class="result-score-section" id="result-score-section" style="display: none;">
+                        <div class="final-score">
+                            <span class="score-label">Puntaje Final</span>
+                            <span class="score-value" id="result-score">0</span>
+                        </div>
+                    </div>
+
+                    <div class="accuracy-bar">
+                        <span class="accuracy-label">Precisión</span>
+                        <div class="accuracy-track">
+                            <div class="accuracy-fill" id="accuracy-fill"></div>
+                        </div>
+                        <span class="accuracy-value" id="accuracy-value">0%</span>
+                    </div>
+
+                    <div class="hints-used" id="hints-section" style="display: none;">
+                        <span>Pistas utilizadas: <strong id="hints-used-count">0</strong></span>
+                        <span id="hints-penalty-text"></span>
+                    </div>
+                </div>
+
+                <div class="results-actions">
+                    <button class="action-btn primary" onclick="app.restartSameMode()">
+                        🔄 Jugar de nuevo
+                    </button>
+                    <button class="action-btn secondary" onclick="app.showScreen('mode-screen')">
+                        🎮 Cambiar modo
+                    </button>
+                    <button class="action-btn tertiary" onclick="app.showScreen('main-menu')">
+                        🏠 Menú principal
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Exit Confirmation Modal -->
+        <div class="modal-overlay" id="exit-modal" style="display: none;">
+            <div class="modal-card glass-card">
+                <h3>¿Salir del juego?</h3>
+                <p>Se perderá el progreso de esta partida.</p>
+                <div class="modal-actions">
+                    <button class="modal-btn cancel" onclick="app.closeExitModal()">Continuar jugando</button>
+                    <button class="modal-btn confirm" onclick="app.exitToMenu()">Salir</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="data/careers/informatica.js"></script>
+    <script src="data/careers/odontologia.js"></script>
+    <script src="data/careers/economia.js"></script>
+    <script src="data/careers/abogacia.js"></script>
+    <script src="data/careers/agrarias.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/questionManager.js"></script>
+    <script src="js/scoreManager.js"></script>
+    <script src="js/hintManager.js"></script>
+    <script src="js/statsManager.js"></script>
+    <script src="js/gameManager.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>
